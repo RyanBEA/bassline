@@ -17,15 +17,17 @@ describe('parseCsv', () => {
 });
 
 describe('fillZeros', () => {
-  it('fills missing dates with zero', () => {
+  it('interpolates gaps within data range, zeros outside', () => {
     const records = parseCsv(`date,kwh
-2025-01-01,10
-2025-01-03,30`);
-    const filled = fillZeros(records, new Date('2025-01-01'), new Date('2025-01-03'));
-    assert.strictEqual(filled.length, 3);
-    assert.strictEqual(filled[1].kwh, 0); // Jan 2 filled with 0
-    assert.strictEqual(filled[0].kwh, 10);
-    assert.strictEqual(filled[2].kwh, 30);
+2025-01-02,10
+2025-01-04,30`);
+    const filled = fillZeros(records, new Date('2025-01-01'), new Date('2025-01-05'));
+    assert.strictEqual(filled.length, 5);
+    assert.strictEqual(filled[0].kwh, 0);  // Jan 1: before data range → 0
+    assert.strictEqual(filled[1].kwh, 10); // Jan 2: known value
+    assert.strictEqual(filled[2].kwh, 20); // Jan 3: interpolated between 10 and 30
+    assert.strictEqual(filled[3].kwh, 30); // Jan 4: known value
+    assert.strictEqual(filled[4].kwh, 0);  // Jan 5: after data range → 0
   });
 });
 

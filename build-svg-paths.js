@@ -25,7 +25,8 @@ const ONE_DAY = 24 * 60 * 60 * 1000;
 
 /**
  * Fill a complete daily series from globalMinDate to globalMaxDate.
- * Days with data keep their kWh value; missing days get 0.
+ * - Outside the dataset's own range (before first / after last): fills with 0.
+ * - Inside the dataset's range: interpolates between known points to bridge gaps.
  */
 function fillZeros(records, globalMinDate, globalMaxDate) {
   const lookup = new Map();
@@ -33,11 +34,40 @@ function fillZeros(records, globalMinDate, globalMaxDate) {
     lookup.set(r.date.toISOString().slice(0, 10), r.kwh);
   }
 
+  const firstDataDate = records.length > 0 ? records[0].date : null;
+  const lastDataDate = records.length > 0 ? records[records.length - 1].date : null;
+
+  // Build sorted array of known data points for interpolation
+  const knownDates = records.map(r => r.date.getTime());
+  const knownValues = records.map(r => r.kwh);
+
+  function interpolate(dateMs) {
+    // Find surrounding known points and linearly interpolate
+    let lo = 0, hi = knownDates.length - 1;
+    while (lo < hi - 1) {
+      const mid = (lo + hi) >> 1;
+      if (knownDates[mid] <= dateMs) lo = mid; else hi = mid;
+    }
+    if (knownDates[hi] <= dateMs) return knownValues[hi];
+    if (knownDates[lo] >= dateMs) return knownValues[lo];
+    const t = (dateMs - knownDates[lo]) / (knownDates[hi] - knownDates[lo]);
+    return knownValues[lo] + t * (knownValues[hi] - knownValues[lo]);
+  }
+
   const filled = [];
   const current = new Date(globalMinDate);
   while (current <= globalMaxDate) {
     const key = current.toISOString().slice(0, 10);
-    filled.push({ date: new Date(current), kwh: lookup.get(key) || 0 });
+    const known = lookup.get(key);
+    let kwh;
+    if (known !== undefined) {
+      kwh = known;
+    } else if (firstDataDate && current >= firstDataDate && current <= lastDataDate) {
+      kwh = interpolate(current.getTime());
+    } else {
+      kwh = 0;
+    }
+    filled.push({ date: new Date(current), kwh });
     current.setTime(current.getTime() + ONE_DAY);
   }
   return filled;
