@@ -23,10 +23,12 @@ function parseCsv(csvText) {
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
+const MAX_INTERP_GAP = 14 * ONE_DAY; // only interpolate gaps shorter than 14 days
+
 /**
  * Fill a complete daily series from globalMinDate to globalMaxDate.
  * - Outside the dataset's own range (before first / after last): fills with 0.
- * - Inside the dataset's range: interpolates between known points to bridge gaps.
+ * - Inside the dataset's range: interpolates short gaps (<14 days), zeros for long gaps.
  */
 function fillZeros(records, globalMinDate, globalMaxDate) {
   const lookup = new Map();
@@ -50,6 +52,8 @@ function fillZeros(records, globalMinDate, globalMaxDate) {
     }
     if (knownDates[hi] <= dateMs) return knownValues[hi];
     if (knownDates[lo] >= dateMs) return knownValues[lo];
+    // Only interpolate short gaps; long gaps (seasonal off-periods) get zero
+    if (knownDates[hi] - knownDates[lo] > MAX_INTERP_GAP) return 0;
     const t = (dateMs - knownDates[lo]) / (knownDates[hi] - knownDates[lo]);
     return knownValues[lo] + t * (knownValues[hi] - knownValues[lo]);
   }
