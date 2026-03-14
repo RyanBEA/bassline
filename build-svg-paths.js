@@ -7,34 +7,50 @@ const PADDING_TOP = 0.1;  // 10% padding at top
 const PADDING_BOT = 0.15; // 15% padding at bottom (area fades into bg)
 
 /**
- * Parse CSV text into normalized {x, y} points fitting a viewBox.
- * Y-axis is inverted (SVG convention: 0 is top).
+ * Parse CSV text into {date, kwh} records, sorted by date.
  */
-function csvToPoints(csvText, width, height) {
-  const lines = csvText.trim().split('\n').slice(1); // skip header
-  const raw = lines
+function parseCsv(csvText) {
+  const lines = csvText.trim().split('\n').slice(1);
+  return lines
     .map(line => {
       const parts = line.split(',');
-      // Handle both date formats (with and without time)
       const date = new Date(parts[0].trim());
       const kwh = parseFloat(parts[1].trim());
       return { date, kwh };
     })
     .filter(d => !isNaN(d.kwh) && !isNaN(d.date.getTime()))
     .sort((a, b) => a.date - b.date);
+}
 
-  if (raw.length === 0) return [];
+/**
+ * Convert parsed records into normalized {x, y} points fitting a viewBox.
+ * X-positions are based on actual dates within a global time range, so
+ * seasonal datasets (e.g. cooling) only occupy their correct portion of the chart.
+ * Y-axis is inverted (SVG convention: 0 is top).
+ *
+ * @param {Array} records - Parsed {date, kwh} records
+ * @param {number} width - ViewBox width
+ * @param {number} height - ViewBox height
+ * @param {Date} [globalMinDate] - Start of global time range (defaults to dataset min)
+ * @param {Date} [globalMaxDate] - End of global time range (defaults to dataset max)
+ */
+function csvToPoints(records, width, height, globalMinDate, globalMaxDate) {
+  if (records.length === 0) return [];
 
-  const minKwh = Math.min(...raw.map(d => d.kwh));
-  const maxKwh = Math.max(...raw.map(d => d.kwh));
+  const minDate = globalMinDate || records[0].date;
+  const maxDate = globalMaxDate || records[records.length - 1].date;
+  const timeRange = maxDate - minDate || 1;
+
+  const minKwh = Math.min(...records.map(d => d.kwh));
+  const maxKwh = Math.max(...records.map(d => d.kwh));
   const range = maxKwh - minKwh || 1;
 
   const usableTop = height * PADDING_TOP;
   const usableBottom = height * (1 - PADDING_BOT);
   const usableHeight = usableBottom - usableTop;
 
-  return raw.map((d, i) => ({
-    x: raw.length === 1 ? 0 : Math.round((i / (raw.length - 1)) * width),
+  return records.map(d => ({
+    x: Math.round(((d.date - minDate) / timeRange) * width),
     y: Math.round(usableBottom - ((d.kwh - minKwh) / range) * usableHeight)
   }));
 }
@@ -77,11 +93,21 @@ const DATASETS = [
 ];
 
 function build() {
-  const result = {};
-  for (const ds of DATASETS) {
+  // Parse all datasets first to find the global date range
+  const parsed = DATASETS.map(ds => {
     const csvPath = path.join(__dirname, ds.file);
     const csv = fs.readFileSync(csvPath, 'utf-8');
-    const points = csvToPoints(csv, VIEW_W, VIEW_H);
+    return { ...ds, records: parseCsv(csv) };
+  });
+
+  // Global date range so all charts share the same x-axis
+  const allDates = parsed.flatMap(ds => ds.records.map(r => r.date));
+  const globalMinDate = new Date(Math.min(...allDates));
+  const globalMaxDate = new Date(Math.max(...allDates));
+
+  const result = {};
+  for (const ds of parsed) {
+    const points = csvToPoints(ds.records, VIEW_W, VIEW_H, globalMinDate, globalMaxDate);
     result[ds.key] = pointsToAreaPath(points, VIEW_H);
   }
 
@@ -95,4 +121,4 @@ if (require.main === module) {
   build();
 }
 
-module.exports = { csvToPoints, pointsToAreaPath };
+module.exports = { parseCsv, csvToPoints, pointsToAreaPath };

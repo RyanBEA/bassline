@@ -1,14 +1,29 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
-const { csvToPoints, pointsToAreaPath } = require('../build-svg-paths');
+const { parseCsv, csvToPoints, pointsToAreaPath } = require('../build-svg-paths');
+
+describe('parseCsv', () => {
+  it('parses CSV text into sorted {date, kwh} records', () => {
+    const csv = `date,kwh
+2025-03-16,60
+2025-03-14,40
+2025-03-15,80`;
+    const records = parseCsv(csv);
+    assert.strictEqual(records.length, 3);
+    // Should be sorted by date
+    assert.strictEqual(records[0].kwh, 40);
+    assert.strictEqual(records[1].kwh, 80);
+    assert.strictEqual(records[2].kwh, 60);
+  });
+});
 
 describe('csvToPoints', () => {
-  it('parses CSV text into sorted {x, y} points normalized to viewBox', () => {
-    const csv = `date,kwh
+  it('converts records into normalized {x, y} points', () => {
+    const records = parseCsv(`date,kwh
 2025-03-14,40
 2025-03-15,80
-2025-03-16,60`;
-    const points = csvToPoints(csv, 1200, 400);
+2025-03-16,60`);
+    const points = csvToPoints(records, 1200, 400);
 
     assert.strictEqual(points.length, 3);
     // First point at x=0, last at x=1200
@@ -20,21 +35,28 @@ describe('csvToPoints', () => {
   });
 
   it('handles single data point', () => {
-    const csv = `date,kwh
-2025-01-01,50`;
-    const points = csvToPoints(csv, 1200, 400);
+    const records = parseCsv(`date,kwh
+2025-01-01,50`);
+    const points = csvToPoints(records, 1200, 400);
     assert.strictEqual(points.length, 1);
     assert.strictEqual(points[0].x, 0);
   });
 
-  it('sorts by date regardless of CSV order', () => {
-    const csv = `date,kwh
-2025-03-16,60
-2025-03-14,40
-2025-03-15,80`;
-    const points = csvToPoints(csv, 1200, 400);
-    // After sorting, values should be 40, 80, 60
-    assert.ok(points[0].y > points[1].y); // 40 is lower value = higher y
+  it('positions seasonal data correctly with a global date range', () => {
+    // Simulate cooling data (only summer) within a full-year range
+    const records = parseCsv(`date,kwh
+2025-06-01,5
+2025-07-01,10
+2025-08-01,7`);
+    const globalMin = new Date('2025-01-01');
+    const globalMax = new Date('2025-12-31');
+    const points = csvToPoints(records, 1200, 400, globalMin, globalMax);
+
+    assert.strictEqual(points.length, 3);
+    // June 1 should be roughly at x=500 (not x=0)
+    assert.ok(points[0].x > 400, `First point x=${points[0].x} should be > 400`);
+    // Aug 1 should be roughly at x=700 (not x=1200)
+    assert.ok(points[2].x < 800, `Last point x=${points[2].x} should be < 800`);
   });
 });
 
