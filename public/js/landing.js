@@ -7,15 +7,14 @@
     const res = await fetch('/api/chart-data');
     data = await res.json();
   } catch {
-    return; // Graceful degradation: no charts if data missing
+    return;
   }
 
-  // Chart layers: bottom to top (total is lowest layer, rendered first)
-  const layers = [
-    { key: 'total',   color: '#4F3D63', opacity: 0.3 },
-    { key: 'heating', color: '#E85D3A', opacity: 0.18, stroke: true },
-    { key: 'cooling', color: '#38BDF8', opacity: 0.18, stroke: true },
-    { key: 'water',   color: '#FBBF24', opacity: 0.15, stroke: true }
+  // Stacked area layers (bottom to top) + total as stroke outline
+  const stackLayers = [
+    { key: 'water',   color: '#FBBF24', opacity: 0.35 },
+    { key: 'heating', color: '#E85D3A', opacity: 0.35 },
+    { key: 'cooling', color: '#38BDF8', opacity: 0.4 }
   ];
 
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -24,31 +23,27 @@
   svg.style.width = '100%';
   svg.style.height = '100%';
 
-  for (const layer of layers) {
+  // Render stacked area fills
+  for (const layer of stackLayers) {
     const pathData = data[layer.key];
     if (!pathData) continue;
 
-    // Area fill
     const fill = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     fill.setAttribute('d', pathData);
     fill.setAttribute('fill', layer.color);
     fill.setAttribute('fill-opacity', layer.opacity);
     svg.appendChild(fill);
+  }
 
-    // Stroke on top (for non-total layers)
-    if (layer.stroke) {
-      // Extract just the line portion (before the closing L...Z)
-      const lineEnd = pathData.lastIndexOf('L');
-      const linePath = pathData.substring(0, lineEnd);
-
-      const stroke = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      stroke.setAttribute('d', linePath);
-      stroke.setAttribute('fill', 'none');
-      stroke.setAttribute('stroke', layer.color);
-      stroke.setAttribute('stroke-width', '1.5');
-      stroke.setAttribute('stroke-opacity', '0.4');
-      svg.appendChild(stroke);
-    }
+  // Total load as stroke outline on top
+  if (data.total) {
+    const stroke = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    stroke.setAttribute('d', data.total);
+    stroke.setAttribute('fill', 'none');
+    stroke.setAttribute('stroke', '#f0eef2');
+    stroke.setAttribute('stroke-width', '1');
+    stroke.setAttribute('stroke-opacity', '0.25');
+    svg.appendChild(stroke);
   }
 
   container.appendChild(svg);
