@@ -54,10 +54,10 @@ function createApp() {
     }
 
     try {
-      const score = scoreAnswers(answers);
-      const videoId = mapScoreToVideo(score);
+      scoreAnswers(answers); // validates input
+      const videoUrl = mapScoreToVideo();
       const id = uuidv4();
-      results.set(id, videoId);
+      results.set(id, videoUrl);
 
       res.json({ redirectUrl: `/report/${id}` });
     } catch (err) {
@@ -67,11 +67,11 @@ function createApp() {
 
   // Report redirect
   app.get('/report/:id', (req, res) => {
-    const videoId = results.get(req.params.id);
-    if (!videoId) {
+    const videoUrl = results.get(req.params.id);
+    if (!videoUrl) {
       return res.status(404).send('Report not found');
     }
-    res.redirect(302, `https://www.youtube.com/watch?v=${videoId}`);
+    res.redirect(302, videoUrl);
   });
 
   return app;

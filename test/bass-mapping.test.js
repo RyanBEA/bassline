@@ -7,26 +7,16 @@ describe('QUESTIONS', () => {
     assert.strictEqual(QUESTIONS.length, 10);
   });
 
-  it('each question has exactly 4 options with 3 dimension scores', () => {
+  it('each question has exactly 4 options', () => {
     for (const q of QUESTIONS) {
       assert.strictEqual(q.options.length, 4, `Question "${q.text}" should have 4 options`);
-      for (const opt of q.options) {
-        assert.ok('warmth' in opt.scores, `Option "${opt.label}" missing warmth`);
-        assert.ok('intensity' in opt.scores, `Option "${opt.label}" missing intensity`);
-        assert.ok('complexity' in opt.scores, `Option "${opt.label}" missing complexity`);
-      }
     }
   });
 });
 
 describe('scoreAnswers', () => {
-  it('sums dimension scores for given answer indices', () => {
-    const answers = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    const score = scoreAnswers(answers);
-    assert.ok('warmth' in score);
-    assert.ok('intensity' in score);
-    assert.ok('complexity' in score);
-    assert.strictEqual(typeof score.warmth, 'number');
+  it('accepts valid answers without throwing', () => {
+    assert.doesNotThrow(() => scoreAnswers([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]));
   });
 
   it('throws on wrong number of answers', () => {
@@ -39,32 +29,28 @@ describe('scoreAnswers', () => {
 });
 
 describe('mapScoreToVideo', () => {
-  it('returns a YouTube video ID string', () => {
-    const videoId = mapScoreToVideo({ warmth: 5, intensity: 5, complexity: 5 });
-    assert.strictEqual(typeof videoId, 'string');
-    assert.ok(videoId.length > 5);
+  it('returns a YouTube URL', () => {
+    const url = mapScoreToVideo();
+    assert.ok(url.includes('youtube.com'), `Expected YouTube URL, got: ${url}`);
   });
 
-  it('maps low-low-low to Stand By Me', () => {
-    const videoId = mapScoreToVideo({ warmth: 0, intensity: 0, complexity: 0 });
-    assert.strictEqual(videoId, 'oIBtePb-dGY');
-  });
-
-  it('maps high-high-high to Under Pressure', () => {
-    const videoId = mapScoreToVideo({ warmth: 30, intensity: 30, complexity: 30 });
-    assert.strictEqual(videoId, 'a01QQZyl-_I');
-  });
-
-  it('is deterministic — same score always maps to same video', () => {
-    const score = { warmth: 12, intensity: 18, complexity: 7 };
-    const v1 = mapScoreToVideo(score);
-    const v2 = mapScoreToVideo(score);
-    assert.strictEqual(v1, v2);
+  it('returns a URL from the VIDEOS list', () => {
+    const urls = VIDEOS.map(v => v.url);
+    for (let i = 0; i < 20; i++) {
+      const url = mapScoreToVideo();
+      assert.ok(urls.includes(url), `Unexpected URL: ${url}`);
+    }
   });
 });
 
 describe('VIDEOS', () => {
-  it('has exactly 8 entries', () => {
-    assert.strictEqual(VIDEOS.length, 8);
+  it('has 7 entries', () => {
+    assert.strictEqual(VIDEOS.length, 7);
+  });
+
+  it('each has a url field', () => {
+    for (const v of VIDEOS) {
+      assert.ok(v.url.startsWith('https://'), `Bad URL: ${v.url}`);
+    }
   });
 });

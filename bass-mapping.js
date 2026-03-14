@@ -92,45 +92,31 @@ const QUESTIONS = [
 ];
 
 const VIDEOS = [
-  { name: 'Stand By Me',              id: 'oIBtePb-dGY' },  // 000: L-L-L
-  { name: 'Money',                    id: '-0kcet4aPpQ' },  // 001: L-L-H
-  { name: 'Another One Bites the Dust', id: 'rY0WxgSXdEE' },// 010: L-H-L
-  { name: 'Schism',                   id: 'UhjG47gtMCo' },  // 011: L-H-H
-  { name: 'Seinfeld Theme',           id: '_V2sBURgUBI' },  // 100: H-L-L
-  { name: 'Come Together',            id: 'axb2sHpGwHQ' },  // 101: H-L-H
-  { name: 'Billie Jean',              id: 'Zi_XLOBDo_Y' },  // 110: H-H-L
-  { name: 'Under Pressure',           id: 'a01QQZyl-_I' }   // 111: H-H-H
+  { name: 'Bass Line 1', url: 'https://www.youtube.com/shorts/LFr-MzVgCSk' },
+  { name: 'Bass Line 2', url: 'https://www.youtube.com/shorts/xUyYANYtbf8' },
+  { name: 'Bass Line 3', url: 'https://www.youtube.com/shorts/fCTmjo_G0sw' },
+  { name: 'Bass Line 4', url: 'https://www.youtube.com/shorts/z_X_HtNqqAA' },
+  { name: 'Bass Line 5', url: 'https://www.youtube.com/watch?v=OUTbj7sJJFA' },
+  { name: 'Bass Line 6', url: 'https://www.youtube.com/shorts/SprscgWorq4' },
+  { name: 'Bass Line 7', url: 'https://www.youtube.com/shorts/6UauEg5v7FQ' }
 ];
-
-const MIDPOINT = 15;
 
 function scoreAnswers(answers) {
   if (answers.length !== 10) {
     throw new Error('Expected 10 answers');
   }
 
-  const score = { warmth: 0, intensity: 0, complexity: 0 };
-
   for (let i = 0; i < 10; i++) {
     const idx = answers[i];
     if (!Number.isInteger(idx) || idx < 0 || idx > 3) {
       throw new Error('Answer index must be 0-3');
     }
-    const opt = QUESTIONS[i].options[idx];
-    score.warmth += opt.scores.warmth;
-    score.intensity += opt.scores.intensity;
-    score.complexity += opt.scores.complexity;
   }
-
-  return score;
 }
 
-function mapScoreToVideo(score) {
-  const w = score.warmth >= MIDPOINT ? 1 : 0;
-  const i = score.intensity >= MIDPOINT ? 1 : 0;
-  const c = score.complexity >= MIDPOINT ? 1 : 0;
-  const index = (w << 2) | (i << 1) | c;
-  return VIDEOS[index].id;
+function mapScoreToVideo() {
+  const index = Math.floor(Math.random() * VIDEOS.length);
+  return VIDEOS[index].url;
 }
 
 module.exports = { QUESTIONS, VIDEOS, scoreAnswers, mapScoreToVideo };
