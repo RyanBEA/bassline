@@ -1,5 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>BASELINE — Analyzing...</title><link rel="stylesheet" href="/css/styles.css"></head>
-<body><main class="loading" id="loading"></main><script src="/js/loading.js"></script></body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BASELINE — Analyzing...</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <main class="loading">
+    <div class="loading-container">
+      <h1 class="loading-title">Analyzing Building Profile</h1>
+
+      <div class="loading-stages" id="stages">
+        <div class="loading-stage" data-stage="0">
+          <span class="stage-icon"><span class="stage-icon-pending"></span></span>
+          <span>Data Ingestion</span>
+        </div>
+        <div class="loading-stage" data-stage="1">
+          <span class="stage-icon"><span class="stage-icon-pending"></span></span>
+          <span>Load Disaggregation</span>
+        </div>
+        <div class="loading-stage" data-stage="2">
+          <span class="stage-icon"><span class="stage-icon-pending"></span></span>
+          <span>Baseline Synthesis</span>
+        </div>
+        <div class="loading-stage" data-stage="3">
+          <span class="stage-icon"><span class="stage-icon-pending"></span></span>
+          <span>Validation</span>
+        </div>
+        <div class="loading-stage" data-stage="4">
+          <span class="stage-icon"><span class="stage-icon-pending"></span></span>
+          <span>Report Generation</span>
+        </div>
+      </div>
+
+      <div class="loading-progress">
+        <div class="loading-progress-fill" id="progress-fill"></div>
+      </div>
+
+      <p class="loading-subtext" id="subtext"></p>
+    </div>
+  </main>
+
+  <script src="/js/loading.js"></script>
+</body>
 </html>

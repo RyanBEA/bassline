@@ -20,6 +20,11 @@ function createApp() {
     res.sendFile(path.join(__dirname, 'views', 'survey.html'));
   });
 
+  // Loading/analysis animation page
+  app.get('/loading', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'loading.html'));
+  });
+
   // Survey questions data (for the frontend to render)
   app.get('/api/questions', (req, res) => {
     // Send questions without scores (don't reveal the mapping!)
