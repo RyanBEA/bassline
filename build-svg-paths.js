@@ -174,11 +174,12 @@ function build() {
   const globalMinDate = totalRaw[0].date;
   const globalMaxDate = totalRaw[totalRaw.length - 1].date;
 
-  // Fill zeros and smooth all datasets to get aligned daily series
-  const totalSmoothed = smoothRecords(fillZeros(totalRaw, globalMinDate, globalMaxDate), 7);
+  // Smooth raw data first (so smoothing only sees real values),
+  // then fill zeros to create the aligned daily series
+  const totalSmoothed = fillZeros(smoothRecords(totalRaw, 7), globalMinDate, globalMaxDate);
   const layers = layerData.map(ds => ({
     ...ds,
-    smoothed: smoothRecords(fillZeros(ds.records, globalMinDate, globalMaxDate), 7)
+    smoothed: fillZeros(smoothRecords(ds.records, 7), globalMinDate, globalMaxDate)
   }));
 
   // Use total load max for y-axis scale
