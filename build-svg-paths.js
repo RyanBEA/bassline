@@ -217,6 +217,7 @@ function build() {
     }));
 
     result[layer.key] = stackedAreaPath(topPoints, bottomPoints);
+    result[layer.key + 'Stroke'] = strokePath(topPoints);
   }
 
   // Total load as stroke outline
