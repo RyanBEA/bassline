@@ -1,5 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>BASELINE — Assessment</title><link rel="stylesheet" href="/css/styles.css"></head>
-<body><main class="survey" id="survey"></main><script src="/js/survey.js"></script></body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BASELINE — Assessment</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <main class="survey">
+    <div class="survey-container" id="survey-container">
+      <div class="survey-progress">
+        <span id="progress-text">Question 1 of 10</span>
+        <div class="survey-progress-bar">
+          <div class="survey-progress-fill" id="progress-fill" style="width: 10%"></div>
+        </div>
+      </div>
+      <div id="question-area"></div>
+    </div>
+  </main>
+
+  <script src="/js/survey.js"></script>
+</body>
 </html>
