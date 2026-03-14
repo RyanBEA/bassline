@@ -217,7 +217,15 @@ function build() {
     }));
 
     result[layer.key] = stackedAreaPath(topPoints, bottomPoints);
-    result[layer.key + 'Stroke'] = strokePath(topPoints);
+
+    // Stroke only where this layer has non-zero values
+    const activePoints = [];
+    for (let i = 0; i < numDays; i++) {
+      if (layer.smoothed[i].kwh > 0.01) {
+        activePoints.push(topPoints[i]);
+      }
+    }
+    result[layer.key + 'Stroke'] = strokePath(activePoints);
   }
 
   // Total load as stroke outline
