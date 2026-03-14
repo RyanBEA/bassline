@@ -218,14 +218,19 @@ function build() {
 
     result[layer.key] = stackedAreaPath(topPoints, bottomPoints);
 
-    // Stroke only where this layer has non-zero values
-    const activePoints = [];
+    // Stroke only where this layer has non-zero values, split into segments
+    const segments = [];
+    let current = [];
     for (let i = 0; i < numDays; i++) {
       if (layer.smoothed[i].kwh > 0.01) {
-        activePoints.push(topPoints[i]);
+        current.push(topPoints[i]);
+      } else if (current.length > 0) {
+        segments.push(current);
+        current = [];
       }
     }
-    result[layer.key + 'Stroke'] = strokePath(activePoints);
+    if (current.length > 0) segments.push(current);
+    result[layer.key + 'Stroke'] = segments.map(seg => strokePath(seg)).join('');
   }
 
   // Total load as stroke outline
