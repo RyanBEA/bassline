@@ -49,6 +49,10 @@ function createApp() {
   app.post('/assess', (req, res) => {
     const { answers } = req.body;
 
+    if (!Array.isArray(answers)) {
+      return res.status(400).json({ error: 'answers must be an array' });
+    }
+
     try {
       const score = scoreAnswers(answers);
       const videoId = mapScoreToVideo(score);

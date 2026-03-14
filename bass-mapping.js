@@ -113,7 +113,7 @@ function scoreAnswers(answers) {
 
   for (let i = 0; i < 10; i++) {
     const idx = answers[i];
-    if (idx < 0 || idx > 3) {
+    if (!Number.isInteger(idx) || idx < 0 || idx > 3) {
       throw new Error('Answer index must be 0-3');
     }
     const opt = QUESTIONS[i].options[idx];
