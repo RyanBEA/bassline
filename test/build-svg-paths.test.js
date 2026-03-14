@@ -42,6 +42,23 @@ describe('csvToPoints', () => {
     assert.strictEqual(points[0].x, 0);
   });
 
+  it('scales y-values proportionally with a global kWh max', () => {
+    // Small values (cooling ~10kWh) should appear much shorter than large values (total ~140kWh)
+    const smallRecords = parseCsv(`date,kwh
+2025-06-01,5
+2025-06-02,10`);
+    const largeRecords = parseCsv(`date,kwh
+2025-06-01,50
+2025-06-02,100`);
+    const globalMax = 100;
+    const smallPts = csvToPoints(smallRecords, 1200, 400, null, null, globalMax);
+    const largePts = csvToPoints(largeRecords, 1200, 400, null, null, globalMax);
+    // The large dataset's max point should be much higher (lower y) than the small one's
+    const smallMinY = Math.min(...smallPts.map(p => p.y));
+    const largeMinY = Math.min(...largePts.map(p => p.y));
+    assert.ok(largeMinY < smallMinY, `Large dataset peak y=${largeMinY} should be < small peak y=${smallMinY}`);
+  });
+
   it('positions seasonal data correctly with a global date range', () => {
     // Simulate cooling data (only summer) within a full-year range
     const records = parseCsv(`date,kwh

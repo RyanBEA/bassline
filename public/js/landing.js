@@ -12,10 +12,10 @@
 
   // Chart layers: bottom to top (total is lowest layer, rendered first)
   const layers = [
-    { key: 'total',   color: '#4F3D63', opacity: 0.2 },
-    { key: 'heating', color: '#E85D3A', opacity: 0.15, stroke: true },
-    { key: 'cooling', color: '#38BDF8', opacity: 0.15, stroke: true },
-    { key: 'water',   color: '#FBBF24', opacity: 0.12, stroke: true }
+    { key: 'total',   color: '#4F3D63', opacity: 0.3 },
+    { key: 'heating', color: '#E85D3A', opacity: 0.18, stroke: true },
+    { key: 'cooling', color: '#38BDF8', opacity: 0.18, stroke: true },
+    { key: 'water',   color: '#FBBF24', opacity: 0.15, stroke: true }
   ];
 
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
