@@ -251,6 +251,47 @@ html, body {
   border-color: var(--brand);
 }
 
+.survey-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.survey-nav-btn {
+  padding: 0.6rem 1.5rem;
+  background: transparent;
+  border: 1px solid rgba(79, 61, 99, 0.4);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.survey-nav-btn:hover:not(:disabled) {
+  background: rgba(79, 61, 99, 0.2);
+  color: var(--text);
+  border-color: var(--brand);
+}
+
+.survey-nav-next {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.survey-nav-next:hover:not(:disabled) {
+  background: #634d7d;
+}
+
+.survey-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 /* === Loading Page === */
 .loading {
   min-height: 100vh;
