@@ -1,7 +1,8 @@
 const express = require('express');
 const path = require('node:path');
 const { v4: uuidv4 } = require('uuid');
-const { scoreAnswers, mapScoreToVideo, QUESTIONS } = require('./bass-mapping');
+const fs = require('node:fs');
+const { scoreAnswers, mapScoreToVideo, extractVideoId, QUESTIONS } = require('./bass-mapping');
 
 function createApp() {
   const app = express();
@@ -65,13 +66,15 @@ function createApp() {
     }
   });
 
-  // Report redirect
+  // Report page with embedded video
   app.get('/report/:id', (req, res) => {
     const videoUrl = results.get(req.params.id);
     if (!videoUrl) {
       return res.status(404).send('Report not found');
     }
-    res.redirect(302, videoUrl);
+    const videoId = extractVideoId(videoUrl);
+    const template = fs.readFileSync(path.join(__dirname, 'views', 'report.html'), 'utf-8');
+    res.send(template.replace('{{VIDEO_ID}}', videoId));
   });
 
   return app;

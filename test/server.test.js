@@ -59,7 +59,7 @@ describe('POST /assess', () => {
   it('returns JSON with redirect URL on valid answers', async () => {
     const app = createApp();
     const res = await request(app, 'POST', '/assess', {
-      answers: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      answers: [0, 0, 0, 0, 0, 0, 0]
     });
     assert.strictEqual(res.status, 200);
     const data = JSON.parse(res.body);
@@ -76,17 +76,17 @@ describe('POST /assess', () => {
 });
 
 describe('GET /report/:id', () => {
-  it('redirects to YouTube for a valid UUID', async () => {
+  it('returns HTML page with embedded YouTube video', async () => {
     const app = createApp();
     // First, create a result
     const postRes = await request(app, 'POST', '/assess', {
-      answers: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      answers: [0, 0, 0, 0, 0, 0, 0]
     });
     const { redirectUrl } = JSON.parse(postRes.body);
 
     const reportRes = await request(app, 'GET', redirectUrl);
-    assert.strictEqual(reportRes.status, 302);
-    assert.ok(reportRes.headers.location.includes('youtube.com'));
+    assert.strictEqual(reportRes.status, 200);
+    assert.ok(reportRes.body.includes('youtube.com/embed/'));
   });
 
   it('returns 404 for unknown UUID', async () => {
@@ -102,7 +102,7 @@ describe('GET /api/questions', () => {
     const res = await request(app, 'GET', '/api/questions');
     assert.strictEqual(res.status, 200);
     const questions = JSON.parse(res.body);
-    assert.strictEqual(questions.length, 10);
+    assert.strictEqual(questions.length, 7);
     for (const q of questions) {
       assert.ok(q.text);
       assert.strictEqual(q.options.length, 4);

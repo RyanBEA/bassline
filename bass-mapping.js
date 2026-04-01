@@ -44,15 +44,15 @@ const QUESTIONS = [
       { label: 'Oil / propane', value: 3, scores: { warmth: 3, intensity: 2, complexity: 0 } }
     ]
   },
-  {
-    text: "How would you characterize the building's overall tone?",
-    options: [
-      { label: 'Tight and efficient',   value: 0, scores: { warmth: 0, intensity: 1, complexity: 2 } },
-      { label: 'Warm but dated',         value: 1, scores: { warmth: 3, intensity: 1, complexity: 1 } },
-      { label: 'Cool and underperforming', value: 2, scores: { warmth: 0, intensity: 2, complexity: 2 } },
-      { label: "It's complicated",       value: 3, scores: { warmth: 1, intensity: 2, complexity: 3 } }
-    ]
-  },
+  // {
+  //   text: "How would you characterize the building's overall tone?",
+  //   options: [
+  //     { label: 'Tight and efficient',   value: 0, scores: { warmth: 0, intensity: 1, complexity: 2 } },
+  //     { label: 'Warm but dated',         value: 1, scores: { warmth: 3, intensity: 1, complexity: 1 } },
+  //     { label: 'Cool and underperforming', value: 2, scores: { warmth: 0, intensity: 2, complexity: 2 } },
+  //     { label: "It's complicated",       value: 3, scores: { warmth: 1, intensity: 2, complexity: 3 } }
+  //   ]
+  // },
   {
     text: "How would you describe the relationship between the building's systems?",
     options: [
@@ -71,24 +71,24 @@ const QUESTIONS = [
       { label: 'Repeats in a regular pattern',   value: 3, scores: { warmth: 0, intensity: 1, complexity: 3 } }
     ]
   },
-  {
-    text: 'How often does major equipment cycle on and off?',
-    options: [
-      { label: 'Rarely',          value: 0, scores: { warmth: 2, intensity: 0, complexity: 0 } },
-      { label: 'Moderately',      value: 1, scores: { warmth: 1, intensity: 1, complexity: 1 } },
-      { label: 'Frequently',      value: 2, scores: { warmth: 0, intensity: 3, complexity: 2 } },
-      { label: 'Varies by season', value: 3, scores: { warmth: 1, intensity: 2, complexity: 3 } }
-    ]
-  },
-  {
-    text: "What's driving your interest in establishing a baseline?",
-    options: [
-      { label: 'Reducing costs',              value: 0, scores: { warmth: 1, intensity: 2, complexity: 1 } },
-      { label: 'Regulatory requirements',     value: 1, scores: { warmth: 0, intensity: 1, complexity: 3 } },
-      { label: 'Preparing for retrofit',      value: 2, scores: { warmth: 1, intensity: 3, complexity: 2 } },
-      { label: "Just curious what my building's groove is", value: 3, scores: { warmth: 3, intensity: 0, complexity: 0 } }
-    ]
-  }
+  // {
+  //   text: 'How often does major equipment cycle on and off?',
+  //   options: [
+  //     { label: 'Rarely',          value: 0, scores: { warmth: 2, intensity: 0, complexity: 0 } },
+  //     { label: 'Moderately',      value: 1, scores: { warmth: 1, intensity: 1, complexity: 1 } },
+  //     { label: 'Frequently',      value: 2, scores: { warmth: 0, intensity: 3, complexity: 2 } },
+  //     { label: 'Varies by season', value: 3, scores: { warmth: 1, intensity: 2, complexity: 3 } }
+  //   ]
+  // },
+  // {
+  //   text: "What's driving your interest in establishing a baseline?",
+  //   options: [
+  //     { label: 'Reducing costs',              value: 0, scores: { warmth: 1, intensity: 2, complexity: 1 } },
+  //     { label: 'Regulatory requirements',     value: 1, scores: { warmth: 0, intensity: 1, complexity: 3 } },
+  //     { label: 'Preparing for retrofit',      value: 2, scores: { warmth: 1, intensity: 3, complexity: 2 } },
+  //     { label: "Just curious what my building's groove is", value: 3, scores: { warmth: 3, intensity: 0, complexity: 0 } }
+  //   ]
+  // }
 ];
 
 const VIDEOS = [
@@ -96,17 +96,34 @@ const VIDEOS = [
   { name: 'Bass Line 2', url: 'https://www.youtube.com/shorts/xUyYANYtbf8' },
   { name: 'Bass Line 3', url: 'https://www.youtube.com/shorts/fCTmjo_G0sw' },
   { name: 'Bass Line 4', url: 'https://www.youtube.com/shorts/z_X_HtNqqAA' },
-  { name: 'Bass Line 5', url: 'https://www.youtube.com/watch?v=OUTbj7sJJFA' },
+  // { name: 'Bass Line 5', url: 'https://www.youtube.com/watch?v=OUTbj7sJJFA' },
   { name: 'Bass Line 6', url: 'https://www.youtube.com/shorts/SprscgWorq4' },
-  { name: 'Bass Line 7', url: 'https://www.youtube.com/shorts/6UauEg5v7FQ' }
+  { name: 'Bass Line 7', url: 'https://www.youtube.com/shorts/6UauEg5v7FQ' },
+  { name: 'Bass Line 8', url: 'https://youtu.be/kAT3aVj-A_E' },
+  { name: 'Bass Line 9', url: 'https://youtube.com/shorts/OmfrQDogdGc' },
+  { name: 'Bass Line 10', url: 'https://youtube.com/shorts/mcbWFRqqI6A' },
+  { name: 'Bass Line 11', url: 'https://youtube.com/shorts/3A4MayQV094' },
+  { name: 'Bass Line 12', url: 'https://youtube.com/shorts/SPW-HXmI2i4' },
+  { name: 'Bass Line 13', url: 'https://youtube.com/shorts/Zfdvl-659uk' },
+  { name: 'Bass Line 14', url: 'https://youtube.com/shorts/MxdA1wNxG40' },
+  { name: 'Bass Line 15', url: 'https://youtube.com/shorts/qdWmCG5N10A' },
+  { name: 'Bass Line 16', url: 'https://youtube.com/shorts/JxhrrvMmBAk' },
+  { name: 'Bass Line 17', url: 'https://youtube.com/shorts/j_FwOUQYq0U' },
+  { name: 'Bass Line 18', url: 'https://youtube.com/shorts/XkJscSR9m5A' },
+  { name: 'Bass Line 19', url: 'https://youtube.com/shorts/wyd9dB-alZU' },
+  { name: 'Bass Line 20', url: 'https://youtube.com/shorts/1-RifZkCKmk' },
+  { name: 'Bass Line 21', url: 'https://youtube.com/shorts/tglzb8CaHLg' },
+  { name: 'Bass Line 22', url: 'https://youtube.com/shorts/LsbygJ64k6Q' },
+  { name: 'Bass Line 23', url: 'https://youtube.com/shorts/9irBTCQPaHY' },
+  { name: 'Bass Line 24', url: 'https://youtube.com/shorts/HJC772cmAyc' }
 ];
 
 function scoreAnswers(answers) {
-  if (answers.length !== 10) {
-    throw new Error('Expected 10 answers');
+  if (answers.length !== QUESTIONS.length) {
+    throw new Error(`Expected ${QUESTIONS.length} answers`);
   }
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < QUESTIONS.length; i++) {
     const idx = answers[i];
     if (!Number.isInteger(idx) || idx < 0 || idx > 3) {
       throw new Error('Answer index must be 0-3');
@@ -114,9 +131,23 @@ function scoreAnswers(answers) {
   }
 }
 
+function extractVideoId(url) {
+  // Handles: youtube.com/shorts/ID, youtube.com/watch?v=ID, youtu.be/ID
+  const patterns = [
+    /youtube\.com\/shorts\/([^/?&]+)/,
+    /youtube\.com\/watch\?v=([^&]+)/,
+    /youtu\.be\/([^/?&]+)/
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+}
+
 function mapScoreToVideo() {
   const index = Math.floor(Math.random() * VIDEOS.length);
   return VIDEOS[index].url;
 }
 
-module.exports = { QUESTIONS, VIDEOS, scoreAnswers, mapScoreToVideo };
+module.exports = { QUESTIONS, VIDEOS, scoreAnswers, mapScoreToVideo, extractVideoId };
