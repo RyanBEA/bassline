@@ -7,14 +7,16 @@ const PADDING_TOP = 0.05; // small top padding so peaks don't clip
 
 /**
  * Parse CSV text into {date, kwh} records, sorted by date.
+ * If colIndex is provided, reads that column (0-based) for the kwh value;
+ * otherwise defaults to column 1.
  */
-function parseCsv(csvText) {
+function parseCsv(csvText, colIndex = 1) {
   const lines = csvText.trim().split('\n').slice(1);
   return lines
     .map(line => {
       const parts = line.split(',');
       const date = new Date(parts[0].trim());
-      const kwh = parseFloat(parts[1].trim());
+      const kwh = parseFloat(parts[colIndex].trim());
       return { date, kwh };
     })
     .filter(d => !isNaN(d.kwh) && !isNaN(d.date.getTime()))
@@ -153,22 +155,42 @@ function strokePath(points) {
 
 // --- Build script ---
 
+// Column indices in energy-daily-final.csv:
+// 0: date, 1: space_heating_kwh, 2: space_cooling_kwh, 3: dhw_kwh, 4: total_kwh
+const DATA_FILE = 'energy-daily-final.csv';
+
 const STACK_LAYERS = [
   // Bottom to top stacking order
-  { file: 'energy-daily-waterheater.csv', key: 'water' },
-  { file: 'energy-daily-heatpump-heating.csv', key: 'heating' },
-  { file: 'energy-daily-heatpump-cooling.csv', key: 'cooling' },
+  { col: 3, key: 'water' },
+  { col: 1, key: 'heating' },
+  { col: 2, key: 'cooling' },
 ];
 
 function build() {
+  const csvText = fs.readFileSync(path.join(__dirname, DATA_FILE), 'utf-8');
+
   // Parse total load for the outline
-  const totalRaw = parseCsv(fs.readFileSync(path.join(__dirname, 'energy-daily-kwh.csv'), 'utf-8'));
+  const totalRaw = parseCsv(csvText, 4);
 
   // Parse stack layers
   const layerData = STACK_LAYERS.map(ds => ({
     ...ds,
-    records: parseCsv(fs.readFileSync(path.join(__dirname, ds.file), 'utf-8'))
+    records: parseCsv(csvText, ds.col)
   }));
+
+  // Determine cooling season from raw data (first/last day with cooling > 0)
+  const coolingLayer = layerData.find(l => l.key === 'cooling');
+  const coolingDays = coolingLayer.records.filter(r => r.kwh > 0);
+  const coolStart = coolingDays.length > 0 ? coolingDays[0].date : null;
+  const coolEnd = coolingDays.length > 0 ? coolingDays[coolingDays.length - 1].date : null;
+
+  // Zero out heating during cooling season (before smoothing, on raw records)
+  const heatingLayer = layerData.find(l => l.key === 'heating');
+  if (coolStart && coolEnd) {
+    for (const hr of heatingLayer.records) {
+      if (hr.date >= coolStart && hr.date <= coolEnd) hr.kwh = 0;
+    }
+  }
 
   // Global date range from total load (most complete coverage)
   const globalMinDate = totalRaw[0].date;
@@ -181,6 +203,18 @@ function build() {
     ...ds,
     smoothed: fillZeros(smoothRecords(ds.records, 7), globalMinDate, globalMaxDate)
   }));
+
+  // After smoothing, clamp seasons: zero out any smoothing bleed across boundaries
+  const heatingSmoothed = layers.find(l => l.key === 'heating');
+  const coolingSmoothed = layers.find(l => l.key === 'cooling');
+  if (coolStart && coolEnd) {
+    for (const r of heatingSmoothed.smoothed) {
+      if (r.date >= coolStart && r.date <= coolEnd) r.kwh = 0;
+    }
+    for (const r of coolingSmoothed.smoothed) {
+      if (r.date < coolStart || r.date > coolEnd) r.kwh = 0;
+    }
+  }
 
   // Use total load max for y-axis scale
   const globalMaxKwh = Math.max(...totalSmoothed.map(r => r.kwh));
@@ -222,7 +256,7 @@ function build() {
     const segments = [];
     let current = [];
     for (let i = 0; i < numDays; i++) {
-      if (layer.smoothed[i].kwh > 0.01) {
+      if (layer.smoothed[i].kwh > 0.05) {
         current.push(topPoints[i]);
       } else if (current.length > 0) {
         segments.push(current);
